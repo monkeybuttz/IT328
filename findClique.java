@@ -8,7 +8,7 @@ class findClique
 
     public void findMaxClique(int m[][])
     {
-
+        
     }
 
     //prints 2D array
@@ -26,10 +26,11 @@ class findClique
         }
     }
 
-    public static void main(String[] args)
+    //input file path with undirected graphs
+    public static void saveMatrix(String pathname)
     {
         try {
-            File myObj = new File("file.txt");
+            File myObj = new File(pathname);
             Scanner scan = new Scanner(myObj);
 
             //size read from graph file
@@ -63,7 +64,10 @@ class findClique
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
-
         printMatrix(matrix); //print the stored matrix!
+    }
+
+    public static void main(String[] args){
+        saveMatrix("file.txt");
     }
 }
