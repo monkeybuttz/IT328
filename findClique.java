@@ -4,36 +4,12 @@ import java.util.*;
 class findClique {
 
     private static ArrayList<int[][]> matrixes = new ArrayList<int[][]>(50);
-    private static int[][] clique;
-    private static int[] edges;
 
     // find max clique of a undirected graph
-    public static int findMaxClique(List<List<Integer>> edges, int nodes) {
-        int maxClique = 0;
+    public static int[] findMaxClique(int[][] graph) {
+        int size = graph.length;
+        int maxClique[] = new int[size];
         return maxClique;
-    }
-
-    // find number of nodes in graph based on length of matrix
-    public static int findVerticies(int m[][]) {
-        int nodes = m.length;
-        System.out.println(nodes);
-        return nodes;
-    }
-
-    // find edges in a graph and save them in a list of pairs
-    public static List<List<Integer>> findEdges(int m[][]) {
-        List<List<Integer>> edges = new ArrayList<List<Integer>>();
-        for (int i = 0; i < m.length; i++) {
-            for (int j = 0; j < m[i].length; j++) {
-                if (m[i][j] == 1) {
-                    List<Integer> edge = new ArrayList<Integer>();
-                    edge.add(i);
-                    edge.add(j);
-                    edges.add(edge);
-                }
-            }
-        }
-        return edges;
     }
 
     // prints 2D array
