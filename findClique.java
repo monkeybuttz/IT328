@@ -5,12 +5,72 @@ class findClique {
 
     private static ArrayList<int[][]> matrixes = new ArrayList<int[][]>(50);
 
-    // find max clique of a undirected graph
-    public static int[] findMaxClique(int[][] graph) {
-        int size = graph.length;
-        int kSize = size-1;
-        int maxClique[] = new int[kSize];
-        return maxClique;
+    // returns maxiumum subgraph of a graph, returns as an array of vertices using recusrsion
+    // graph is undirected graph
+    // node is the vertex in which the recursion starts
+    // clique is the array that will be returned
+    // **if graph has over 30 vertices, it may take a long time to run**
+    public static int[] findMaxClique(int[][] graph, int node, int[] clique) {
+        // base case
+        if (node == graph.length) {
+            return clique;
+        }
+
+        // if node is not adjacent to any vertex in clique, add it to clique
+        if (isAdjacent(graph, node, clique)) {
+            clique = addNode(clique, node);
+        }
+
+        // find max clique with node added to clique
+        int[] clique1 = findMaxClique(graph, node + 1, clique);
+
+        // find max clique with node not added to clique
+        int[] clique2 = findMaxClique(graph, node + 1, removeNode(clique, node));
+
+        // return max clique
+        if (clique1.length > clique2.length) {
+            return clique1;
+        } else {
+            return clique2;
+        }
+
+    }
+
+    // removes node from clique array
+    private static int[] removeNode(int[] clique, int node) {
+        int[] newClique = new int[clique.length - 1];
+        int index = 0;
+        for (int i = 0; i < clique.length-1; i++) {
+            if (clique[i] != node) {
+                newClique[index] = clique[i];
+                index++;
+            }
+        }
+        return newClique;
+    }
+
+    // adds node to clique array
+    private static int[] addNode(int[] clique, int node) {
+        int[] newClique = new int[clique.length + 1];
+        for (int i = 0; i < clique.length; i++) {
+            newClique[i] = clique[i];
+        }
+        newClique[clique.length] = node;
+        return newClique;
+    }
+
+    // returns true if node is adjacent to all vertices in clique
+    // part of maximal clique algorithm
+    private static boolean isAdjacent(int[][] graph, int node, int[] clique) {
+        if(clique.length == 0){
+            return true;
+        }
+        for (int i = 0; i < clique.length; i++) {
+            if (graph[node][clique[i]] == 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
     // prints 2D array
@@ -65,11 +125,21 @@ class findClique {
         }
     }
 
+    //driver code for the problem
     public static void main(String[] args) {
         saveMatrixes("graphs.txt");
         for(int i=0; i<matrixes.size();i++){
-            printMatrix(matrixes.get(i));
+            int clique [] = new int[0];
+            int [] kClique = findMaxClique(matrixes.get(i), 0, clique);
+            for(int j=0; j<kClique.length; j++){
+                if(j == kClique.length-1){
+                    System.out.print(kClique[j]);
+                    break;
+                }
+                System.out.print(kClique[j] + ", ");
+                
+            }
+            System.out.println('\n');
         }
-
     }
 }
