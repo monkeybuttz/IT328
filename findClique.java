@@ -8,7 +8,8 @@ class findClique {
     // find max clique of a undirected graph
     public static int[] findMaxClique(int[][] graph) {
         int size = graph.length;
-        int maxClique[] = new int[size];
+        int kSize = size-1;
+        int maxClique[] = new int[kSize];
         return maxClique;
     }
 
