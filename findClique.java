@@ -33,7 +33,6 @@ class findClique {
         } else {
             return clique2;
         }
-
     }
 
     // removes node from clique array
@@ -62,7 +61,7 @@ class findClique {
     // returns true if node is adjacent to all vertices in clique
     // part of maximal clique algorithm
     private static boolean isAdjacent(int[][] graph, int node, int[] clique) {
-        if(clique.length == 0){
+        if (clique.length == 0) {
             return true;
         }
         for (int i = 0; i < clique.length; i++) {
@@ -73,7 +72,8 @@ class findClique {
         return true;
     }
 
-    // prints 2D array
+    // prints 2D array as a matrix
+    // good for testing
     public static void printMatrix(int[][] mat) {
         // loop through rows
         for (int i = 0; i < mat.length; i++) {
@@ -87,6 +87,7 @@ class findClique {
     }
 
     // input file path with undirected graphs
+    // stores graphs in matrixes arraylist
     public static void saveMatrixes(String pathname) {
         try {
             File myObj = new File(pathname);
@@ -137,7 +138,6 @@ class findClique {
                     break;
                 }
                 System.out.print(kClique[j] + ", ");
-                
             }
             System.out.println('\n');
         }
