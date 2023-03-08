@@ -7,32 +7,7 @@ import java.util.*;
 
 class findVCover
 {
-    private static int[][] matrix;
-    private static int[][] complement;
-
-    // constructs complement graph for clique problem reduction
-    public static int[][] constructComplement(int[][] mat)
-    {
-        int size = mat.length;
-        int[][] comp = new int[size][size];
-
-        for (int i = 0; i < size; i++)
-        {
-            for (int j = 0; j < size; j++)
-            {
-                if (mat[i][j] == 1)
-                {
-                    comp[i][j] = 0;
-                }
-                else
-                {
-                    comp[i][j] = 1;
-                }
-            }
-        }
-        
-        return comp;
-    }
+    private static ArrayList<int[][]> complements = new ArrayList<int[][]>(50);
 
     // prints 2D array
     public static void printMatrix(int mat[][]) {
@@ -46,33 +21,49 @@ class findVCover
         }
     }
 
-    // input file path with undirected graphs
-    public static void saveMatrix(String pathname) {
+    // stores graphs in complements arraylist
+    // converts graphs to complement graphs
+    public static void saveMatricesAsComplements(String pathname) {
         try {
             File myObj = new File(pathname);
             Scanner scan = new Scanner(myObj);
 
-            // size read from graph file
-            int size = scan.nextInt();
-            String[] data2 = new String[size];
-            scan.nextLine();
-
-            // set matrix size
-            matrix = new int[size][size];
-
-            // for looping through matrix
-            int row = 0;
-
-            // loop through remaining lines of file
             while (scan.hasNextLine()) {
-                String data = scan.nextLine(); // reads line from graph file
-                data2 = data.split("\\s+"); // splits white space, stores characters in array
+                // size read from graph file
+                int size = scan.nextInt();
+                String[] data2 = new String[size];
+                scan.nextLine();
 
-                // store line of numbers to corresponding row in matrix
-                for (int i = 0; i < size; i++) {
-                    matrix[row][i] = Integer.parseInt(data2[i]); // cast string to int, store in matrix
+                // set matrix size
+                int matrix[][] = new int[size][size];
+
+                // for looping through matrix
+                int row = 0;
+
+                // loop through remaining lines of file
+                while (scan.hasNextLine()) {
+                    String data = scan.nextLine(); // reads line from graph file
+                    data2 = data.split("\\s+"); // splits white space, stores characters in array
+
+                    // store line of numbers to corresponding row in matrix
+                    // save graphs as complements
+                    for (int i = 0; i < size; i++) {
+                        int temp = Integer.parseInt(data2[i]); // cast string to int
+
+                        if (temp == 1)
+                        {
+                            temp = 0;
+                        }
+                        else
+                        {
+                            temp = 1;
+                        }
+                        matrix[row][i] = temp; // store complement value in matrix
+                    }
+                    row++;
+                    if(row == size) break; // break out of loop if all rows are filled
                 }
-                row++;
+                complements.add(matrix);
             }
             scan.close();
         } catch (FileNotFoundException e) {
@@ -82,12 +73,18 @@ class findVCover
     }
 
     public static void main(String[] args) {
-        saveMatrix("file.txt");
-        printMatrix(matrix);
-        
-        System.out.println();
+        saveMatricesAsComplements("graphs.txt");
 
-        complement = constructComplement(matrix);
-        printMatrix(complement);
+        // prints all complement graphs
+        // int[][] comp;
+        
+        // for (int i = 0; i < complements.size(); i++)
+        // {
+        //     comp = complements.get(i);
+        //     printMatrix(comp);
+        //     System.out.println();
+        // }
+        
+        // System.out.println("Done!");
     }
 }
