@@ -1,25 +1,17 @@
 // This program takes an undirected graph G and returns a minimum vertex cover in G.
 // The problem is not solved directly, the problem is reduced to a maximum clique
 // problem to be solved by the findClique.java program.
+// IT 328 Section 1
+// Spring 2023
+// By Kaden Hargrove
 
 import java.io.*;
 import java.util.*;
 
-class findVCover
+class findVCover extends findClique
 {
+    // primary data structure to store complement graphs from graphs.txt
     private static ArrayList<int[][]> complements = new ArrayList<int[][]>(50);
-
-    // prints 2D array
-    public static void printMatrix(int mat[][]) {
-        // loop through rows
-        for (int i = 0; i < mat.length; i++) {
-            // loop through all elements of current row
-            for (int j = 0; j < mat[i].length; j++) {
-                System.out.print(mat[i][j] + " ");
-            }
-            System.out.println();
-        }
-    }
 
     // stores graphs in complements arraylist
     // converts graphs to complement graphs
@@ -72,19 +64,64 @@ class findVCover
         }
     }
 
+    //call find max clique function from findClique.java and print results
+    public static String toString(int[][] matrix, int iterations) {
+        long startTime = System.currentTimeMillis();
+        int[] clique = findMaxClique(matrix);
+        long timeDifference = System.currentTimeMillis() - startTime;
+
+        //create set of vertices in graph
+        Set<Integer> vertices = new HashSet<Integer>();
+        for (int i = 0; i < matrix.length; i++) {
+            vertices.add(i);
+        }
+
+        //convert found clique array to set
+        Set<Integer> cliqueVertices = new HashSet<Integer>();
+        for (int i = 0; i < clique.length; i++)
+        {
+            cliqueVertices.add(clique[i]);
+        }
+
+        //find difference of sets 
+        //min vertex cover = vertices - vertices in max clique of complement graph
+        vertices.removeAll(cliqueVertices);
+
+        return "G" + iterations + " (" + matrix.length + ", " + findEdgesInOriginalGraph(matrix) + ")  (size=" + vertices.size() + " ms="
+                + timeDifference + ")  " + vertices.toString() + "";
+    }
+
+    // returns the number of edges in the non-complement graph
+    // used to determine |E| in toString method
+    public static int findEdgesInOriginalGraph(int[][] graph) {
+        int edges = 0;
+        for (int i = 0; i < graph.length; i++) {
+            for (int j = 0; j < graph.length; j++) {
+                if (graph[i][j] == 0 && i != j) {
+                    edges++;
+                }
+            }
+        }
+        return edges / 2;
+    }
+
+    // driver code for the Minimum Vertex Cover problem
     public static void main(String[] args) {
+        // validate number of arguments
+        if (args.length != 1) {
+            System.out.println("Proper Usage is: java findVCover graphs.txt");
+            System.exit(0);
+        }
+
+        //save matrices from graph file
         saveMatricesAsComplements("graphs.txt");
 
-        // prints all complement graphs
-        // int[][] comp;
-        
-        // for (int i = 0; i < complements.size(); i++)
-        // {
-        //     comp = complements.get(i);
-        //     printMatrix(comp);
-        //     System.out.println();
-        // }
-        
-        // System.out.println("Done!");
+        System.out.println("\n* A Minimum Vertex Cover of every graph in graphs.txt: (reduced to K-Clique) *");
+        System.out.println("    (|V|,|E|)  (size, ms used)  Vertex Cover");
+
+        // loop through each graph in complements arraylist and print toString
+        for (int i = 0; i < complements.size() - 1; i++) {
+            System.out.println(toString(complements.get(i), i + 1));
+        }
     }
 }

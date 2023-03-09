@@ -134,6 +134,7 @@ class findClique {
         }
     }
 
+    // formats and prints results of findMaxClique() call
     public static String toString(int[][] matrix, int iterations) {
         long startTime = System.currentTimeMillis();
         int[] clique = findMaxClique(matrix);
@@ -144,9 +145,15 @@ class findClique {
 
     // driver code for the Maximum Clique problem
     public static void main(String[] args) {
+
+        // validate number of arguments
+        if (args.length != 1) {
+            System.out.println("Proper Usage is: java findClique graphs.txt");
+            System.exit(0);
+        }
         saveMatrices(args[0]);
-        System.out.println("\n * Maximum Cliques in Graphs,txt *");
-        System.out.println("   (|V|,|E|)  (Size, ms used)  (Cliques)");
+        System.out.println("\n* Max Cliques in graphs.txt *");
+        System.out.println("    (|V|,|E|)  (size, ms used)  (Cliques)");
         // loop through each graph in matrices arraylist and print toString
         for (int i = 0; i < matrices.size() - 1; i++) {
             System.out.println(toString(matrices.get(i), i + 1));
