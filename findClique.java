@@ -1,123 +1,131 @@
 import java.io.*;
 import java.util.*;
 
+// IT 328
+// Assignment 1
+// Greg Yonan
+
 class findClique {
 
-    private static ArrayList<int[][]> matrixes = new ArrayList<int[][]>(50);
+    // primary data structure to store graphs
+    private static ArrayList<int[][]> matrices = new ArrayList<int[][]>(50);
 
-    // returns maxiumum subgraph of a graph, returns as an array of vertices using recusrsion
-    // graph is undirected graph
-    // node is the vertex in which the recursion starts
-    // clique is the array that will be returned
-    // **if graph has over 30 vertices, it may take a long time to run**
-    public static int[] findMaxClique(int[][] graph, int node, int[] clique) {
-        // base case
-        if (node == graph.length) {
-            return clique;
+    // takes graph and calls recursive method with list of vertices
+    // returns maximum clique
+    public static int[] findMaxClique(int[][] graph) {
+        int size = graph.length;
+        int[] clique = new int[0];
+        List<Integer> candidateList = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            candidateList.add(i);
         }
-
-        // if node is not adjacent to any vertex in clique, add it to clique
-        if (isAdjacent(graph, node, clique)) {
-            clique = addNode(clique, node);
-        }
-
-        // find max clique with node added to clique
-        int[] clique1 = findMaxClique(graph, node + 1, clique);
-
-        // find max clique with node not added to clique
-        int[] clique2 = findMaxClique(graph, node + 1, removeNode(clique, node));
-
-        // return max clique
-        if (clique1.length > clique2.length) {
-            return clique1;
-        } else {
-            return clique2;
-        }
+        // recursive algorithm to find max clique
+        clique = branchAndBound(graph, new int[0], candidateList, clique);
+        return clique;
     }
 
-    // removes node from clique array
-    private static int[] removeNode(int[] clique, int node) {
-        int[] newClique = new int[clique.length - 1];
-        int index = 0;
-        for (int i = 0; i < clique.length-1; i++) {
-            if (clique[i] != node) {
-                newClique[index] = clique[i];
-                index++;
+    // recursive branch and bound algorithm
+    // takes undirected graph, returns maximum clique
+    private static int[] branchAndBound(int[][] graph, int[] current, List<Integer> candidates, int[] best) {
+        // base case, graph has no vertices, return empty clique
+        if (candidates.isEmpty()) {
+            return current;
+        }
+        // if maximum possible clique has already been found, return current best
+        if (current.length + candidates.size() <= best.length) {
+            return best;
+        }
+
+        int[] clique = current;
+        for (int i = 0; i < candidates.size(); i++) {
+            int vertex = candidates.get(i); // current vertex
+            if (current.length == 0 || isAdjacent(graph, vertex, current)) {
+                List<Integer> newCandidates = new ArrayList<>();
+                for (int j = i + 1; j < candidates.size(); j++) {
+                    int node = candidates.get(j);
+                    if (isAdjacent(graph, node, current)) {
+                        newCandidates.add(node);
+                    }
+                }
+                // add vertex to new current clique
+                int[] newCurrent = addNode(current, vertex);
+                // recursive call to find max clique
+                int[] newClique = branchAndBound(graph, newCurrent, newCandidates, clique);
+                // if new found clique is better than old best clique, update
+                if (newClique.length > clique.length) {
+                    clique = newClique;
+                }
             }
         }
-        return newClique;
+        return clique;
     }
 
-    // adds node to clique array
-    private static int[] addNode(int[] clique, int node) {
-        int[] newClique = new int[clique.length + 1];
-        for (int i = 0; i < clique.length; i++) {
-            newClique[i] = clique[i];
+    // add node to clique by creating new array and copying old clique to new
+    public static int[] addNode(int[] oldClique, int vertex) {
+        int[] newClique = new int[oldClique.length + 1];
+        // copy old clique to new
+        for (int i = 0; i < oldClique.length; i++) {
+            newClique[i] = oldClique[i];
         }
-        newClique[clique.length] = node;
+        // add node to end of new clique
+        newClique[oldClique.length] = vertex;
         return newClique;
     }
 
-    // returns true if node is adjacent to all vertices in clique
-    // part of maximal clique algorithm
-    private static boolean isAdjacent(int[][] graph, int node, int[] clique) {
+    // returns true only if vertex is adjacent to all vertices in clique
+    // part of maximum clique algorithm
+    private static boolean isAdjacent(int[][] graph, int vertex, int[] clique) {
         if (clique.length == 0) {
             return true;
         }
         for (int i = 0; i < clique.length; i++) {
-            if (graph[node][clique[i]] == 0) {
+            if (graph[vertex][clique[i]] == 0) {
                 return false;
             }
         }
         return true;
     }
 
-    // prints 2D array as a matrix
-    // good for testing
-    public static void printMatrix(int[][] mat) {
-        // loop through rows
-        for (int i = 0; i < mat.length; i++) {
-            // loop through all elements of current row
-            for (int j = 0; j < mat[i].length; j++) {
-                System.out.print(mat[i][j]);
+    // count the number of edges in a graph
+    // used to determine |E| in toString method
+    public static int findEdges(int[][] graph) {
+        int edges = 0;
+        for (int i = 0; i < graph.length; i++) {
+            for (int j = 0; j < graph.length; j++) {
+                if (graph[i][j] == 1 && i != j) {
+                    edges++;
+                }
             }
-            System.out.println();
         }
-        System.out.println();
+        return edges / 2;
     }
 
-    // input file path with undirected graphs
-    // stores graphs in matrixes arraylist
-    public static void saveMatrixes(String pathname) {
+    // input a file path with undirected graphs
+    // stores graphs in matrices arraylist, returns nothing
+    public static void saveMatrices(String pathname) {
         try {
             File myObj = new File(pathname);
             Scanner scan = new Scanner(myObj);
-
             while (scan.hasNextLine()) {
-                // size read from graph file
+                // read size of matrix from file and create matrix
                 int size = scan.nextInt();
-                String[] data2 = new String[size];
+                String[] matrixData = new String[size];
                 scan.nextLine();
-
-                // set matrix size
                 int matrix[][] = new int[size][size];
-
-                // for looping through matrix
+                // loop through remaining lines of matrix in the file
                 int row = 0;
-
-                // loop through remaining lines of file
                 while (scan.hasNextLine()) {
-                    String data = scan.nextLine(); // reads line from graph file
-                    data2 = data.split("\\s+"); // splits white space, stores characters in array
-
+                    String data = scan.nextLine();
+                    matrixData = data.split("\\s+"); // splits white space, stores characters in String array
                     // store line of numbers to corresponding row in matrix
                     for (int i = 0; i < size; i++) {
-                        matrix[row][i] = Integer.parseInt(data2[i]); // cast string to int, store in matrix
+                        matrix[row][i] = Integer.parseInt(matrixData[i]);
                     }
                     row++;
-                    if(row == size) break; // break out of loop if all rows are filled
+                    if (row == size)
+                        break;
                 }
-                matrixes.add(matrix);
+                matrices.add(matrix);
             }
             scan.close();
         } catch (FileNotFoundException e) {
@@ -126,20 +134,22 @@ class findClique {
         }
     }
 
-    //driver code for the problem
+    public static String toString(int[][] matrix, int iterations) {
+        long startTime = System.currentTimeMillis();
+        int[] clique = findMaxClique(matrix);
+        long timeDifference = System.currentTimeMillis() - startTime;
+        return "G" + iterations + " (" + matrix.length + ", " + findEdges(matrix) + ")  (size=" + clique.length + " ms="
+                + timeDifference + ")  " + Arrays.toString(clique) + "";
+    }
+
+    // driver code for the Maximum Clique problem
     public static void main(String[] args) {
-        saveMatrixes("graphs.txt");
-        for(int i=0; i<matrixes.size();i++){
-            int clique [] = new int[0];
-            int [] kClique = findMaxClique(matrixes.get(i), 0, clique);
-            for(int j=0; j<kClique.length; j++){
-                if(j == kClique.length-1){
-                    System.out.print(kClique[j]);
-                    break;
-                }
-                System.out.print(kClique[j] + ", ");
-            }
-            System.out.println('\n');
+        saveMatrices(args[0]);
+        System.out.println("\n * Maximum Cliques in Graphs,txt *");
+        System.out.println("   (|V|,|E|)  (Size, ms used)  (Cliques)");
+        // loop through each graph in matrices arraylist and print toString
+        for (int i = 0; i < matrices.size() - 1; i++) {
+            System.out.println(toString(matrices.get(i), i + 1));
         }
     }
 }
