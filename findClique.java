@@ -1,6 +1,8 @@
 import java.io.*;
 import java.util.*;
 
+// This problem takes an undirected graph G and returns a maximum clique.
+// This problem helps us also solve the Vertex Cover problem.
 // IT 328
 // Assignment 1
 // Greg Yonan

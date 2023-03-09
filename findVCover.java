@@ -115,7 +115,6 @@ class findVCover extends findClique
 
         //save matrices from graph file
         saveMatricesAsComplements("graphs.txt");
-
         System.out.println("\n* A Minimum Vertex Cover of every graph in graphs.txt: (reduced to K-Clique) *");
         System.out.println("    (|V|,|E|)  (size, ms used)  Vertex Cover");
 
